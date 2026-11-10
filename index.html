@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="pt-BR" ng-app="agendaTech" ng-strict-di>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Agenda fictícia de eventos de tecnologia em Salvador para a atividade de AngularJS.">
+  <title>Agenda Tech Salvador | Pulso Tech</title>
+  <link rel="icon" href="assets/icone.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/estilos.css">
+  <script defer src="vendor/angular.min.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="services/catalogo.factory.js"></script>
+  <script defer src="services/toast.service.js"></script>
+  <script defer src="directives/acordeao.js"></script>
+  <script defer src="directives/paginacao.js"></script>
+  <script defer src="directives/barra-progresso.js"></script>
+  <script defer src="directives/abas.js"></script>
+  <script defer src="directives/menu-suspenso.js"></script>
+  <script defer src="directives/notificacao-toast.js"></script>
+  <script defer src="controllers/agenda.controller.js"></script>
+</head>
+<body id="topo">
+  <a class="skip-link" href="#eventos">Ir para a programação</a>
+
+  <header class="site-header">
+    <div class="layout header-inner">
+      <a class="brand" href="#topo" aria-label="Pulso Tech, início">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 13h4l3-7 3 12 2.5-5H20" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span>Pulso <strong>Tech</strong></span>
+      </a>
+      <nav class="site-nav" aria-label="Navegação principal">
+        <a href="#eventos">Programação</a>
+        <a href="#inscricao">Inscrição</a>
+        <a href="#duvidas">Dúvidas</a>
+      </nav>
+    </div>
+  </header>
+
+  <noscript><p class="layout">Ative o JavaScript para usar a programação interativa.</p></noscript>
+
+  <main class="layout" ng-controller="AgendaController" ng-cloak>
+    <section class="hero" aria-labelledby="titulo-agenda">
+      <div class="hero-copy">
+        <p class="eyebrow hero-label"><span aria-hidden="true"></span> Salvador, Bahia</p>
+        <h1 id="titulo-agenda">Agenda Tech <em>Salvador</em></h1>
+        <p class="hero-description">Oficinas, palestras e encontros de comunidade. Explore a programação e simule sua inscrição.</p>
+        <a class="hero-link" href="#eventos">Ver programação <span aria-hidden="true">↓</span></a>
+      </div>
+
+      <svg class="hero-art" viewBox="0 0 480 304" fill="none" aria-hidden="true" focusable="false">
+        <defs>
+          <pattern id="grade-hero" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="1" fill="#B4A6FF" opacity=".20"/>
+          </pattern>
+          <linearGradient id="sol-hero" x1="217" y1="69" x2="309" y2="187" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FFD39E"/>
+            <stop offset="1" stop-color="#FA8B62"/>
+          </linearGradient>
+          <linearGradient id="onda-hero" x1="30" y1="220" x2="460" y2="220" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#B4A6FF" stop-opacity="0"/>
+            <stop offset=".46" stop-color="#B4A6FF" stop-opacity=".68"/>
+            <stop offset="1" stop-color="#B4A6FF" stop-opacity=".14"/>
+          </linearGradient>
+          <clipPath id="horizonte-hero">
+            <rect width="480" height="177"/>
+          </clipPath>
+        </defs>
+        <rect x="21" y="18" width="429" height="265" fill="url(#grade-hero)"/>
+        <circle cx="277" cy="146" r="105" stroke="#B4A6FF" stroke-opacity=".38"/>
+        <circle cx="277" cy="146" r="128" stroke="#B4A6FF" stroke-opacity=".20"/>
+        <circle cx="277" cy="146" r="79" fill="url(#sol-hero)" clip-path="url(#horizonte-hero)"/>
+        <path d="M29 177H450M29 190h421M65 206h365M99 224h319M149 244h240M197 264h160"
+          stroke="url(#onda-hero)"/>
+        <path d="M390 82h22m-11-11v22M137 122h14m-7-7v14M396 214h14m-7-7v14"
+          stroke="#E0D8FF" stroke-opacity=".76" stroke-linecap="round"/>
+        <circle cx="165" cy="209" r="4" fill="#FFB98B"/>
+        <circle cx="358" cy="66" r="3" fill="#E0D8FF"/>
+      </svg>
+    </section>
+
+    <div class="dashboard">
+      <section class="panel agenda-panel" id="eventos" aria-labelledby="titulo-eventos">
+        <div class="panel-heading">
+          <div>
+            <h2 id="titulo-eventos">Programação</h2>
+            <p>Encontre seu próximo evento.</p>
+          </div>
+          <span class="period-badge">NOV–DEZ 2026</span>
+        </div>
+
+        <div class="filters">
+          <div class="field">
+            <label for="busca">Buscar evento</label>
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="10.8" cy="10.8" r="5.8" stroke="currentColor" stroke-width="1.8"/>
+                <path d="m15 15 4.3 4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+              <input type="search" id="busca" placeholder="Nome ou local" autocomplete="off"
+                ng-model="busca" ng-change="atualizarLista()">
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">Categoria</span>
+            <menu-suspenso opcoes="categorias" valor="categoria"
+              ao-selecionar="alterarCategoria(opcao)"></menu-suspenso>
+          </div>
+        </div>
+
+        <p class="results-count" role="status">
+          {{ eventos.length }} {{ eventos.length === 1 ? 'evento encontrado' : 'eventos encontrados' }}
+        </p>
+
+        <ul class="event-list" ng-if="eventos.length">
+          <li class="event-row" ng-repeat="evento in eventos | limitTo:tamanhoPagina:((pagina - 1) * tamanhoPagina) track by evento.id">
+            <time class="date-tile" ng-attr-datetime="{{ evento.data }}">
+              <strong>{{ evento.data | date:'dd':'-0300' }}</strong>
+              <span>{{ evento.data | date:'MM/yyyy':'-0300' }}</span>
+            </time>
+            <div class="event-copy">
+              <span class="category-tag" ng-class="'category-' + evento.categoria.toLowerCase()">{{ evento.categoria }}</span>
+              <h3>{{ evento.titulo }}</h3>
+              <p>{{ evento.local }} <span aria-hidden="true">·</span> {{ evento.data | date:'HH:mm':'-0300' }}</p>
+            </div>
+            <button type="button" class="event-action" ng-click="selecionarEvento(evento)"
+              ng-class="{ 'is-selected': eventoSelecionado === evento }"
+              ng-attr-aria-current="{{ eventoSelecionado === evento ? 'true' : undefined }}"
+              ng-attr-aria-label="{{ (eventoSelecionado === evento ? 'Selecionado: ' : 'Selecionar ') + evento.titulo }}">
+              {{ eventoSelecionado === evento ? 'Selecionado' : 'Selecionar' }}
+            </button>
+          </li>
+        </ul>
+        <div class="empty-state" ng-if="!eventos.length">
+          <strong>Nenhum evento corresponde à busca.</strong>
+          <p>Tente outro nome, local ou categoria.</p>
+        </div>
+
+        <paginacao-agenda ng-if="totalPaginas > 0" total="totalPaginas" atual="pagina"
+          ao-mudar="mudarPagina(pagina)"></paginacao-agenda>
+      </section>
+
+      <div class="sidebar">
+        <section class="panel registration-panel" id="inscricao" aria-labelledby="titulo-inscricao">
+          <h2 id="titulo-inscricao">Simule sua inscrição</h2>
+
+          <div class="progress-caption">
+            <span>{{ progresso / 50 }} de 2 etapas</span>
+            <strong>{{ progresso | number:0 }}%</strong>
+          </div>
+          <barra-progresso valor="progresso"></barra-progresso>
+
+          <div class="registration-status" ng-switch="progresso" aria-live="polite">
+            <p ng-switch-when="0">Selecione um evento na programação para começar.</p>
+            <p ng-switch-when="50"><strong>{{ eventoSelecionado.titulo }}</strong> selecionado. Confirme para concluir.</p>
+            <p ng-switch-when="100">Inscrição simulada concluída para <strong>{{ eventoSelecionado.titulo }}</strong>.</p>
+          </div>
+
+          <div class="registration-actions">
+            <button type="button" class="primary-button" ng-click="confirmarInscricao()"
+              ng-disabled="progresso !== 50">
+              {{ progresso === 100 ? 'Inscrição confirmada' : 'Confirmar inscrição' }}
+            </button>
+            <button type="button" class="text-button" ng-click="reiniciarInscricao()" ng-if="progresso > 0">
+              Reiniciar
+            </button>
+          </div>
+        </section>
+
+        <section class="panel about-panel" aria-labelledby="titulo-sobre">
+          <h2 id="titulo-sobre">Sobre a agenda</h2>
+          <abas-agenda abas="abasSobre"></abas-agenda>
+        </section>
+      </div>
+
+      <section class="panel faq-panel" id="duvidas" aria-labelledby="titulo-duvidas">
+        <div>
+          <h2 id="titulo-duvidas">Perguntas frequentes</h2>
+          <p class="section-description">Como funciona esta demonstração.</p>
+        </div>
+        <acordeao-agenda itens="perguntas"></acordeao-agenda>
+      </section>
+    </div>
+
+    <notificacao-toast></notificacao-toast>
+  </main>
+
+  <footer class="site-footer">
+    <div class="layout footer-inner">
+      <span>Pulso Tech <span aria-hidden="true">·</span> Agenda demonstrativa</span>
+      <span>Atividade de AngularJS <span aria-hidden="true">·</span> 2026</span>
+    </div>
+  </footer>
+</body>
+</html>
